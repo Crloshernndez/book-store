@@ -6,20 +6,21 @@ const http = require("http");
 
 class Server {
   // se agregan dependencias
-  constructor({ config }) {
+  constructor({ config, router }) {
     this._config = config;
-    this._express = express();
+    this.app = express();
+    this.app.use(router);
 
     //indicamos los archivos estaticos
-    this._express.use(express.static(path.join(__dirname, "public")));
+    this.app.use(express.static(path.join(__dirname, "public")));
     //creamos logica para engine template ejs
-    this._express.set("view engine", "ejs");
-    this._express.set("views", "views");
+    this.app.set("view engine", "ejs");
+    this.app.set("views", "views");
   }
 
   start() {
     return new Promise((resolve, reject) => {
-      const server = http.createServer(this._express);
+      const server = http.createServer(this.app);
       server.listen(this._config.PORT, () => {
         console.log(`Application running on port ${this._config.PORT}`);
         resolve();
