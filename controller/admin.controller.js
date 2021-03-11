@@ -30,6 +30,7 @@ class AdminController {
       return res.redirect("/");
     }
     const prodId = req.params.productId;
+
     Product.getProductById(prodId, (product) => {
       if (!product) {
         return res.render("/");
@@ -43,6 +44,25 @@ class AdminController {
     });
   };
 
+  //metodo para editar producto = POST
+  editProduct = (req, res, next) => {
+    const prodId = req.body.productId;
+
+    const updatedTitle = req.body.title;
+    const updatedPrice = req.body.price;
+    const updatedImageUrl = req.body.imageUrl;
+    const updatedDescription = req.body.description;
+    const updatedProduct = new Product(
+      prodId,
+      updatedTitle,
+      updatedImageUrl,
+      updatedPrice,
+      updatedDescription
+    );
+    updatedProduct.save();
+    res.redirect("/admin/products");
+  };
+
   // metodo para agregar productos a la db = POST
   addProduct = (req, res, next) => {
     const title = req.body.title;
@@ -52,6 +72,12 @@ class AdminController {
     const product = new Product(null, title, imageUrl, price, description);
     product.save();
     res.redirect("/");
+  };
+
+  deleteProduct = (req, res, next) => {
+    const prodId = req.body.productId;
+    Product.deleteProductById(prodId);
+    res.redirect("/admin/products");
   };
 }
 

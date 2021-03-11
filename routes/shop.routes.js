@@ -5,9 +5,12 @@ module.exports = function ({ shopController }) {
 
   router.get("/", shopController.getShop);
   router.get("/products", shopController.getProductsList);
+  router.get("/products/:productId", shopController.getProduct);
   router.get("/cart", shopController.getCart);
   router.get("/orders", shopController.getOrders);
   router.get("/checkout", shopController.getCheckout);
+  router.post("/cart", shopController.addToCart);
+  router.post("/cart-delete-item", shopController.deleteProductCart);
 
   return router;
 };
