@@ -15,6 +15,9 @@ const AdminController = require("./controller/admin.controller");
 const ShopController = require("./controller/shop.controller");
 const PageNotFoundController = require("./controller/notFountPage.controller");
 
+// database
+// const db = require("./database");
+
 // se crea el container parainyeccion de dependencias
 const container = createContainer();
 
@@ -38,5 +41,9 @@ container
     shopController: asClass(ShopController).singleton(),
     pageNotFoundController: asClass(PageNotFoundController).singleton(),
   });
+// registro de database
+// .register({
+//   db: asValue(db),
+// });
 
 module.exports = container;

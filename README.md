@@ -10,7 +10,7 @@ in version 1.0.0 we manage an internal file database
 
     in your local
 
-        > clone the project.
+        > clone the project
         > npm install. (install dependencies).
         > npm start
 

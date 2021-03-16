@@ -1,6 +1,12 @@
 const container = require("./container");
+const sequelize = require("./database");
 
 const application = container.resolve("app");
 
 // llamamos el metodo start para iniciar la app
-application.start();
+application
+  .start()
+  .then(() => {
+    sequelize.sync();
+  })
+  .catch((err) => console.log(err));
