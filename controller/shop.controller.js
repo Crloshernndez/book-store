@@ -1,4 +1,4 @@
-const Product = require("../models/product.model");
+const Product = require("../database/models/product.model");
 const Cart = require("../models/cart.model");
 
 class ShopController {
@@ -6,36 +6,48 @@ class ShopController {
 
   // render shop view = GET
   getShop = (req, res, next) => {
-    Product.getProducts((products) => {
-      res.render("shop/shop", {
-        prods: products,
-        pageTitle: "Shop",
-        path: "/",
+    Product.findAll()
+      .then((products) => {
+        res.render("shop/shop", {
+          prods: products,
+          pageTitle: "Shop",
+          path: "/",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   };
 
   // render product-list view = GET
   getProductsList = (req, res, next) => {
-    Product.getProducts((products) => {
-      res.render("shop/product-list", {
-        prods: products,
-        pageTitle: "All Products",
-        path: "/products",
+    Product.findAll()
+      .then((products) => {
+        res.render("shop/product-list", {
+          prods: products,
+          pageTitle: "Shop",
+          path: "/products",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   };
 
   //metodo para obtener un producto por el id = GET
   getProduct = (req, res, next) => {
     const prodId = req.params.productId;
-    Product.getProductById(prodId, (product) => {
-      res.render("shop/product-details", {
-        product: product,
-        pageTitle: product.title,
-        path: "/products",
+    Product.findByPk(prodId)
+      .then((product) => {
+        res.render("shop/product-details", {
+          product: product,
+          pageTitle: product.title,
+          path: "/products",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   };
 
   // metodo para traer los productos de la data y renderizar la view cart = GET

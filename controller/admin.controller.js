@@ -14,13 +14,17 @@ class AdminController {
 
   // metodo para traer los productos de la data y renderizar la view products => GET
   getProducts = (req, res, next) => {
-    Product.getProducts((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
+    Product.findAll()
+      .then((products) => {
+        res.render("admin/products", {
+          prods: products,
+          pageTitle: "Admin Products",
+          path: "/admin/products",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   };
 
   //metodo para obtener un producto por el id = GET
@@ -31,17 +35,19 @@ class AdminController {
     }
     const prodId = req.params.productId;
 
-    Product.getProductById(prodId, (product) => {
-      if (!product) {
-        return res.render("/");
-      }
-      res.render("admin/form-product", {
-        pageTitle: "Edit Product",
-        path: "/admin/form-prodcut",
-        editing: editMode,
-        product: product,
-      });
-    });
+    Product.findByPk(prodId)
+      .then((product) => {
+        if (!product) {
+          return res.render("/");
+        }
+        res.render("admin/form-product", {
+          pageTitle: "Edit Product",
+          path: "/admin/form-prodcut",
+          editing: editMode,
+          product: product,
+        });
+      })
+      .catch((err) => console.log(err));
   };
 
   //metodo para editar producto = POST
@@ -52,15 +58,20 @@ class AdminController {
     const updatedPrice = req.body.price;
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
-    const updatedProduct = new Product(
-      prodId,
-      updatedTitle,
-      updatedImageUrl,
-      updatedPrice,
-      updatedDescription
-    );
-    updatedProduct.save();
-    res.redirect("/admin/products");
+    Product.update(
+      {
+        title: updatedTitle,
+        price: updatedPrice,
+        description: updatedDescription,
+        imageUrl: updatedImageUrl,
+      },
+      { where: { id: prodId } }
+    )
+      .then(() => {
+        console.log("Product Updated Successfully");
+        res.redirect("/admin/products");
+      })
+      .catch((err) => console.log(err));
   };
 
   // metodo para agregar productos a la db = POST
