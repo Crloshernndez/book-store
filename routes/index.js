@@ -6,13 +6,23 @@ module.exports = function ({
   adminRoutes,
   shopRoutes,
   pageNotFoundController,
+  db,
 }) {
   const router = express.Router();
   const apiRouter = express.Router();
 
   // indicamos los primeros middlewares
   apiRouter.use(cors()).use(bodyParser.urlencoded({ extended: false }));
-
+  apiRouter.use((req, res, next) => {
+    db.User.findByPk(1)
+      .then((user) => {
+        req.user = user;
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
   // configuramos las rutas
 
   apiRouter.use("/admin", adminRoutes);

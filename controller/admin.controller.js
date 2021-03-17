@@ -16,7 +16,8 @@ class AdminController {
 
   // metodo para traer los productos de la data y renderizar la view products => GET
   getProducts = (req, res, next) => {
-    this._db.Product.findAll()
+    req.user
+      .getProducts()
       .then((products) => {
         res.render("admin/products", {
           prods: products,
@@ -37,7 +38,9 @@ class AdminController {
     }
     const prodId = req.params.productId;
 
-    this._db.Product.findByPk(prodId)
+    req.user
+      .getProducts({ where: { id: prodId } })
+      // this._db.Product.findByPk(prodId)
       .then((product) => {
         if (!product) {
           return res.render("/");
@@ -46,7 +49,7 @@ class AdminController {
           pageTitle: "Edit Product",
           path: "/admin/form-prodcut",
           editing: editMode,
-          product: product,
+          product: product[0],
         });
       })
       .catch((err) => console.log(err));
@@ -82,12 +85,13 @@ class AdminController {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    this._db.Product.create({
-      title: title,
-      imageUrl: imageUrl,
-      price: price,
-      description: description,
-    })
+    req.user
+      .createProduct({
+        title: title,
+        imageUrl: imageUrl,
+        price: price,
+        description: description,
+      })
       .then((result) => {
         console.log("Product Added Successfully");
         res.redirect("/");

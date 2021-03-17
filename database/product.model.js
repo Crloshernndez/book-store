@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         constraints: true,
         onDelete: "CASCADE",
       });
+      // un product puede pertenecer a varios cart
+      Product.belongsToMany(models.Cart, {
+        through: models.CartItem,
+      });
     }
   }
   Product.init(
