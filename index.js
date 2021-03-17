@@ -1,5 +1,5 @@
 const container = require("./container");
-const sequelize = require("./database");
+const db = require("./database");
 
 const application = container.resolve("app");
 
@@ -7,6 +7,6 @@ const application = container.resolve("app");
 application
   .start()
   .then(() => {
-    sequelize.sync();
+    db.sequelize.sync();
   })
   .catch((err) => console.log(err));

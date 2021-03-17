@@ -1,12 +1,14 @@
-const Product = require("../database/models/product.model");
+// const Product = require("../database/product.model");
 const Cart = require("../models/cart.model");
 
 class ShopController {
-  constructor() {}
+  constructor({ db }) {
+    this._db = db;
+  }
 
   // render shop view = GET
   getShop = (req, res, next) => {
-    Product.findAll()
+    this._db.Product.findAll()
       .then((products) => {
         res.render("shop/shop", {
           prods: products,
@@ -21,7 +23,7 @@ class ShopController {
 
   // render product-list view = GET
   getProductsList = (req, res, next) => {
-    Product.findAll()
+    this._db.Product.findAll()
       .then((products) => {
         res.render("shop/product-list", {
           prods: products,
@@ -37,7 +39,7 @@ class ShopController {
   //metodo para obtener un producto por el id = GET
   getProduct = (req, res, next) => {
     const prodId = req.params.productId;
-    Product.findByPk(prodId)
+    this._db.Product.findByPk(prodId)
       .then((product) => {
         res.render("shop/product-details", {
           product: product,

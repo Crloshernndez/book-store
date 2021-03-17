@@ -1,7 +1,9 @@
-const Product = require("../database/models/product.model");
+// const Product = require("../database/product.model");
 
 class AdminController {
-  constructor() {}
+  constructor({ db }) {
+    this._db = db;
+  }
 
   // metodo para renderizar view add-product => GET
   getAddProduct = (req, res, next) => {
@@ -14,7 +16,7 @@ class AdminController {
 
   // metodo para traer los productos de la data y renderizar la view products => GET
   getProducts = (req, res, next) => {
-    Product.findAll()
+    this._db.Product.findAll()
       .then((products) => {
         res.render("admin/products", {
           prods: products,
@@ -35,7 +37,7 @@ class AdminController {
     }
     const prodId = req.params.productId;
 
-    Product.findByPk(prodId)
+    this._db.Product.findByPk(prodId)
       .then((product) => {
         if (!product) {
           return res.render("/");
@@ -58,7 +60,7 @@ class AdminController {
     const updatedPrice = req.body.price;
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
-    Product.update(
+    this._db.Product.update(
       {
         title: updatedTitle,
         price: updatedPrice,
@@ -80,7 +82,7 @@ class AdminController {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    Product.create({
+    this._db.Product.create({
       title: title,
       imageUrl: imageUrl,
       price: price,
@@ -88,16 +90,21 @@ class AdminController {
     })
       .then((result) => {
         console.log("Product Added Successfully");
+        res.redirect("/");
       })
       .catch((err) => console.log(err));
-
-    res.redirect("/");
   };
 
   deleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.deleteProductById(prodId);
-    res.redirect("/admin/products");
+    this._db.Product.destroy({ where: { id: prodId } })
+      .then(() => {
+        res.redirect("/admin/products");
+        console.log("your product was deleted successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 }
 
