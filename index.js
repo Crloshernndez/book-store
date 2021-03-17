@@ -9,4 +9,13 @@ application
   .then(() => {
     db.sequelize.sync();
   })
+  .then(() => {
+    return db.User.findByPk(1);
+  })
+  .then((user) => {
+    if (!user) {
+      return db.User.create({ name: "Carlos", email: "carlos@gmail.com" });
+    }
+    return user;
+  })
   .catch((err) => console.log(err));

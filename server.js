@@ -6,8 +6,9 @@ const http = require("http");
 
 class Server {
   // se agregan dependencias
-  constructor({ config, router }) {
-    this._config = config;
+  constructor({ config, router, db }) {
+    this.db = db;
+    this.config = config;
     this.app = express();
     this.app.use(router);
 
@@ -21,10 +22,29 @@ class Server {
   start() {
     return new Promise((resolve, reject) => {
       const server = http.createServer(this.app);
-      server.listen(this._config.PORT, () => {
-        console.log(`Application running on port ${this._config.PORT}`);
-        resolve();
-      });
+      this.db.sequelize
+        .sync({ force: true })
+        .then(() => {
+          return this.db.User.findByPk(1);
+        })
+        .then((user) => {
+          if (!user) {
+            return this.db.User.create({
+              name: "Carlos",
+              email: "carlos@gmail.com",
+            });
+          }
+          return user;
+        })
+        .then(() => {
+          server.listen(this.config.PORT, () => {
+            console.log(`Application running on port ${this.config.PORT}`);
+            resolve();
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     });
   }
 }

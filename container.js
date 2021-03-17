@@ -27,6 +27,10 @@ container
     server: asClass(Serve).singleton(),
     config: asValue(config),
   })
+  // registro de database
+  .register({
+    db: asValue(db),
+  })
 
   // registro para las rutas
   .register({
@@ -40,10 +44,6 @@ container
     adminController: asClass(AdminController).singleton(),
     shopController: asClass(ShopController).singleton(),
     pageNotFoundController: asClass(PageNotFoundController).singleton(),
-  })
-  // registro de database
-  .register({
-    db: asValue(db),
   });
 
 module.exports = container;
