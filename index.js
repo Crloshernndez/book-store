@@ -1,5 +1,5 @@
 const container = require("./container");
-const sequelize = require("./database");
+const sequelize = require("./database/models");
 
 const application = container.resolve("app");
 

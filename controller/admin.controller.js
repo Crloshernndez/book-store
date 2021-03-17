@@ -1,4 +1,4 @@
-const Product = require("../models/product.model");
+const Product = require("../database/models/product.model");
 
 class AdminController {
   constructor() {}
@@ -69,8 +69,17 @@ class AdminController {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    const product = new Product(null, title, imageUrl, price, description);
-    product.save();
+    Product.create({
+      title: title,
+      imageUrl: imageUrl,
+      price: price,
+      description: description,
+    })
+      .then((result) => {
+        console.log("Product Added Successfully");
+      })
+      .catch((err) => console.log(err));
+
     res.redirect("/");
   };
 
