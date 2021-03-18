@@ -78,10 +78,24 @@ class ShopController {
 
   // render orders view = GET
   getOrders = (req, res, next) => {
-    res.render("shop/orders", {
-      pageTitle: "Your Orders",
-      path: "/orders",
-    });
+    req.user
+      .getOrders({ includes: ["Products"] })
+      .then((orders) => {
+        let order = orders[0];
+        return order.getProducts().then((products) => {
+          console.log(products);
+
+          res.render("shop/orders", {
+            pageTitle: "Your Orders",
+            path: "/orders",
+            orders: orders,
+            products: products,
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   // render checkout view = GET
@@ -133,6 +147,42 @@ class ShopController {
       })
       .then(() => {
         res.redirect("/cart");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  createOrder = (req, res, next) => {
+    let cartProducts;
+    // obtenemos el cart
+    req.user
+      .getCart()
+      .then((cart) => {
+        cartProducts = cart;
+        // obtenemos los productos del cart
+        return cart.getProducts();
+      })
+      .then((products) => {
+        // se crea la order a travez del user
+        return req.user.createOrder().then((order) => {
+          // agregamos los productos del cart a la order
+          return order.addProducts(
+            // mapeamos los productos para obtener quantity
+            products.map((product) => {
+              product.OrderItem = {
+                quantity: product.CartItem.quantity,
+                cost: product.CartItem.price,
+              };
+              return product;
+            })
+          );
+        });
+      })
+      .then(() => {
+        // vaciamos el cart
+        cartProducts.setProducts(null);
+        res.redirect("/orders");
       })
       .catch((err) => {
         console.log(err);

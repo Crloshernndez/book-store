@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       Product.belongsToMany(models.Cart, {
         through: models.CartItem,
       });
+      Product.belongsToMany(models.Order, {
+        through: models.OrderItem,
+      });
     }
   }
   Product.init(

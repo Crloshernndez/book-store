@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       quantity: {
         type: DataTypes.INTEGER,
       },
+      cost: {
+        type: DataTypes.DOUBLE,
+      },
     },
     {
       sequelize,

@@ -23,7 +23,7 @@ class Server {
     return new Promise((resolve, reject) => {
       const server = http.createServer(this.app);
       this.db.sequelize
-        .sync({ force: true })
+        .sync()
         .then(() => {
           return this.db.User.findByPk(1);
         })
