@@ -54,30 +54,26 @@ class ShopController {
 
   // metodo para traer los productos de la data y renderizar la view cart = GET
   getCart = (req, res, next) => {
-    Cart.getCart((cart) => {
-      Product.getProducts((products) => {
-        const cartProducts = [];
-        for (let product of products) {
-          const cartProductData = cart.products.find(
-            (prod) => prod.id === product.id
-          );
-          if (cartProductData) {
-            cartProducts.push({
-              productData: product,
-              quantity: cartProductData.quantity,
-              priceProducts: product.price * cartProductData.quantity,
-            });
-          }
-        }
+    req.user
+      //obtenemos el cart
+      .getCart()
+      // con el cart buscamos los productos que hay dentro de el
+      .then((cart) => {
+        return cart.getProducts();
+      })
+      .then((products) => {
+        console.log(products);
 
         res.render("shop/cart", {
           pageTitle: "Your Cart",
           path: "/cart",
-          products: cartProducts,
-          totalPrice: cart.totalPrice,
+          products: products,
+          // totalPrice: cart.totalPrice,
         });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   };
 
   // render orders view = GET
@@ -99,20 +95,68 @@ class ShopController {
   // metodo para agregar productos al cart = POST
   addToCart = (req, res, next) => {
     const prodId = req.body.productId;
-
-    Product.getProductById(prodId, (product) => {
-      Cart.addProductToCart(prodId, product.price);
-    });
-    res.redirect("/cart");
+    let newCart;
+    let newQuantity = 1;
+    // accedemos al cart del usuario
+    req.user
+      .getCart()
+      // accedemos a todos los productos del cart
+      .then((cart) => {
+        newCart = cart;
+        // retornamos los productos que tengan el mismo id que el producto a agregar
+        return cart.getProducts({ where: { id: prodId } });
+      })
+      //si existe asignamos el producto obtenido en una variable
+      .then((products) => {
+        let product;
+        if (products.length > 0) {
+          product = products[0];
+        }
+        // aumentamos quantity del producto
+        if (product) {
+          const oldQuantity = product.CartItem.quantity;
+          newQuantity = oldQuantity + 1;
+          return product;
+        }
+        // si el producto no existe en el cart
+        return this._db.Product.findByPk(prodId);
+      })
+      // agregamos el producto al cart
+      .then((product) => {
+        return newCart.addProduct(product, {
+          // pasamos el valor de newQuantity
+          through: {
+            quantity: newQuantity,
+            price: product.price * newQuantity,
+          },
+        });
+      })
+      .then(() => {
+        res.redirect("/cart");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   // metodo para eliminar producto del cart = POST
   deleteProductCart = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.getProductById(prodId, (product) => {
-      Cart.deleteProductFromCart(prodId, product.price);
-      res.redirect("/cart");
-    });
+    req.user
+      .getCart()
+      .then((cart) => {
+        return cart.getProducts({ where: { id: prodId } });
+      })
+      .then((products) => {
+        const product = products[0];
+        return product.CartItem.destroy();
+      })
+      .then(() => {
+        res.redirect("/cart");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 }
 

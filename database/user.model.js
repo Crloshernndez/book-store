@@ -7,6 +7,8 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Product);
       // un usuario puede tener solo un cart
       User.hasOne(models.Cart);
+      // un usuario puede tener varias order
+      User.hasMany(models.Order);
     }
   }
   User.init(

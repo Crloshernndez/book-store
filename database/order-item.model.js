@@ -1,8 +1,9 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class CartItem extends Model {}
-  CartItem.init(
+  class OrderItem extends Model {}
+
+  OrderItem.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -12,17 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       quantity: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      price: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "CartItem",
+      modelName: "OrderItem",
     }
   );
-  return CartItem;
+  return OrderItem;
 };

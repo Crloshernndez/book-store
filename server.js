@@ -36,6 +36,9 @@ class Server {
           }
           return user;
         })
+        .then((user) => {
+          user.createCart();
+        })
         .then(() => {
           server.listen(this.config.PORT, () => {
             console.log(`Application running on port ${this.config.PORT}`);
